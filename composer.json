@@ -1,0 +1,17 @@
+{
+    "name": "anton/granula",
+    "description": "Granula ORM",
+    "require": {
+        "doctrine/dbal": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Elfet",
+            "email": "anton@elfet.ru"
+        }
+    ]
+}
