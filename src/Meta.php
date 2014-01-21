@@ -1,0 +1,55 @@
+<?php
+/* (c) Anton Medvedev <anton@elfet.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Granula;
+
+use Granula\Meta\Field;
+use Granula\Meta\Index;
+
+class Meta
+{
+    private $table;
+    private $fields = [];
+    private $indexes = [];
+
+    public function table($table)
+    {
+        $this->table = $table;
+    }
+
+    public function field($name, $type)
+    {
+        return $this->fields[$name] = new Field($name, $type);
+    }
+
+    public function index($columns, $name)
+    {
+        return $this->indexes[$name] = new Index($columns, $name);
+    }
+
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @return Field[]
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @return Index[]
+     */
+    public function getIndexes()
+    {
+        return $this->indexes;
+    }
+
+}

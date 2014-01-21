@@ -1,17 +1,22 @@
 {
     "name": "anton/granula",
     "description": "Granula ORM",
+    "authors": [
+        {
+            "name": "Elfet",
+            "email": "anton@elfet.ru"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Granula\\": "src/"
+        }
+    },
     "require": {
         "doctrine/dbal": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "*"
     },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Elfet",
-            "email": "anton@elfet.ru"
-        }
-    ]
+    "license": "MIT"
 }
