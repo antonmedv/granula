@@ -10,6 +10,7 @@ namespace Granula;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Visitor\DropSchemaSqlCollector;
 
 class SchemaTool
 {
@@ -132,5 +133,109 @@ class SchemaTool
         }
 
         return $schema;
+    }
+
+    /**
+     * Drops the database schema for the given classes.
+     *
+     * In any way when an exception is thrown it is suppressed since drop was
+     * issued for all classes of the schema and some probably just don't exist.
+     *
+     * @return void
+     */
+    public function dropSchema()
+    {
+        $dropSchemaSql = $this->getDropSchemaSQL();
+        $conn = $this->em->getConnection();
+
+        foreach ($dropSchemaSql as $sql) {
+            try {
+                $conn->executeQuery($sql);
+            } catch (\Exception $e) {
+
+            }
+        }
+    }
+
+    /**
+     * Drops all elements in the database of the current connection.
+     *
+     * @return void
+     */
+    public function dropDatabase()
+    {
+        $dropSchemaSql = $this->getDropDatabaseSQL();
+        $conn = $this->em->getConnection();
+
+        foreach ($dropSchemaSql as $sql) {
+            $conn->executeQuery($sql);
+        }
+    }
+
+    /**
+     * Gets the SQL needed to drop the database schema for the connections database.
+     *
+     * @return array
+     */
+    public function getDropDatabaseSQL()
+    {
+        $sm = $this->connection->getSchemaManager();
+        $schema = $sm->createSchema();
+
+        $visitor = new DropSchemaSqlCollector($this->platform);
+        $schema->visit($visitor);
+
+        return $visitor->getQueries();
+    }
+
+    /**
+     * Gets SQL to drop the tables defined by the passed classes.
+     *
+     * @return array
+     */
+    public function getDropSchemaSQL()
+    {
+        $visitor = new DropSchemaSqlCollector($this->platform);
+        $schema = $this->getSchema();
+
+        $sm = $this->em->getConnection()->getSchemaManager();
+        $fullSchema = $sm->createSchema();
+
+        foreach ($fullSchema->getTables() as $table) {
+            if ( ! $schema->hasTable($table->getName())) {
+                foreach ($table->getForeignKeys() as $foreignKey) {
+                    /* @var $foreignKey \Doctrine\DBAL\Schema\ForeignKeyConstraint */
+                    if ($schema->hasTable($foreignKey->getForeignTableName())) {
+                        $visitor->acceptForeignKey($table, $foreignKey);
+                    }
+                }
+            } else {
+                $visitor->acceptTable($table);
+                foreach ($table->getForeignKeys() as $foreignKey) {
+                    $visitor->acceptForeignKey($table, $foreignKey);
+                }
+            }
+        }
+
+        if ($this->platform->supportsSequences()) {
+            foreach ($schema->getSequences() as $sequence) {
+                $visitor->acceptSequence($sequence);
+            }
+
+            foreach ($schema->getTables() as $table) {
+                /* @var $sequence Table */
+                if ($table->hasPrimaryKey()) {
+                    $columns = $table->getPrimaryKey()->getColumns();
+                    if (count($columns) == 1) {
+                        $checkSequence = $table->getName() . "_" . $columns[0] . "_seq";
+                        if ($fullSchema->hasSequence($checkSequence)) {
+                            $visitor->acceptSequence($fullSchema->getSequence($checkSequence));
+                        }
+                    }
+                }
+            }
+        }
+
+        return $visitor->getQueries();
     }
 } 

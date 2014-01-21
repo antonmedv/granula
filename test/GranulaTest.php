@@ -31,6 +31,7 @@ class GranulaTest extends \PHPUnit_Framework_TestCase
         $st = $em->getSchemaTool();
         $sql = $st->getUpdateSchemaSql();
         $st->updateSchema();
+        //$st->dropSchema();
 
         print_r($sql);
     }
