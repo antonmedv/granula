@@ -8,17 +8,35 @@
 namespace Fixture;
 
 use Granula\Meta;
+use Granula\Repository;
 
 class User
 {
+    use Repository;
+
+    /**
+     * @var integer
+     */
     protected $id;
 
+    /**
+     * @var string
+     */
     protected $name;
 
+    /**
+     * @var string
+     */
     protected $password;
 
+    /**
+     * @var string
+     */
     protected $email;
 
+    /**
+     * @var string
+     */
     protected $avatar;
 
     public static function describe(Meta $meta)
@@ -27,8 +45,91 @@ class User
         $meta->field('id', 'integer')->primary()->options(['autoincrement' => true]);
         $meta->field('name', 'string');
         $meta->field('password', 'string');
+        //$meta->field('plain_password', 'string');
         $meta->field('email', 'string')->unique()->options(['notnull' => true]);
         $meta->field('avatar', 'string')->options(['notnull' => false, 'default' => '']);
         $meta->index(['name', 'email'], 'name_email_index');
     }
+
+    /**
+     * @param string $avatar
+     */
+    public function setAvatar($avatar)
+    {
+        $this->avatar = $avatar;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAvatar()
+    {
+        return $this->avatar;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+
 } 

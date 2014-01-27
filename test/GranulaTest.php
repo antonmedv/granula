@@ -8,13 +8,23 @@
 namespace Granula;
 
 use Fixture\User;
+use Granula\EntityManager\EntityManagerEventArgs;
 
 class GranulaTest extends \PHPUnit_Framework_TestCase
 {
     public function testGranula()
     {
-        $config = new \Doctrine\DBAL\Configuration();
+        $evm = new EventManager();
+        $evm->addEventListener(EntityManager\Events::preUpdateSchema, function (EntityManagerEventArgs $ea) {
+            $sql = EntityManager::getInstance()->getSchemaTool()->getUpdateSchemaSql();
+
+            print_r($sql);
+        });
+
         $params = [
+            'dev' => true,
+            'event_manager' => $evm,
+
             'driver' => 'pdo_mysql',
             'host' => 'localhost',
             'user' => 'root',
@@ -22,18 +32,12 @@ class GranulaTest extends \PHPUnit_Framework_TestCase
             'dbname' => 'granula',
             'charset' => 'utf8'
         ];
-        $connection = \Doctrine\DBAL\DriverManager::getConnection($params, $config);
 
-        $em = new EntityManager($connection, [
+        $em = new EntityManager($params, [
             User::class,
         ]);
 
-        $st = $em->getSchemaTool();
-        $sql = $st->getUpdateSchemaSql();
-        $st->updateSchema();
-        //$st->dropSchema();
-
-        print_r($sql);
+        $user = User::find(1);
     }
 }
  

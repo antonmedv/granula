@@ -97,11 +97,7 @@ class SchemaTool
     {
         $schema = new Schema();
 
-        $classes = $this->em->getClasses();
-
-        foreach ($classes as $class) {
-            $meta = new Meta();
-            $class::describe($meta);
+        foreach ($this->em->getMetaForAllClasses() as $meta) {
 
             $table = $schema->createTable($meta->getTable());
             $primaryKeys = [];
