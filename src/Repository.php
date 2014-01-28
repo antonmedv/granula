@@ -7,11 +7,35 @@
 
 namespace Granula;
 
-trait Repository 
+trait Repository
 {
     public static function find($id)
     {
         $em = EntityManager::getInstance();
         $meta = $em->getMetaForClass(get_called_class());
+
+        $sql = '';
+
+        $conn = $em->getConnection();
+        $query = $conn->prepare($sql);
+
+        $qb = $conn->createQueryBuilder();
+        $qb->select();
+
+        $query->bindParam(1, $id);
+        $query->execute();
+
+        $query->fetch();
+    }
+
+    public static function query($sql, $params = [], \Closure $map = null)
+    {
+        $em = EntityManager::getInstance();
+
+        $query = $em->getConnection()->prepare($sql);
+        $query->execute($params);
+
+        $row = $query->fetch();
+        yield false === $row ? null : $map($row);
     }
 }

@@ -15,26 +15,26 @@ class EntityManagerEventArgs extends BaseEventArgs
     /**
      * @var EntityManager
      */
-    private $em;
+    private $entityManager;
 
     public function __construct($em)
     {
-        $this->em = $em;
+        $this->entityManager = $em;
     }
 
     /**
      * @param \Granula\EntityManager $em
      */
-    public function setEm($em)
+    public function setEntityManager($em)
     {
-        $this->em = $em;
+        $this->entityManager = $em;
     }
 
     /**
      * @return \Granula\EntityManager
      */
-    public function getEm()
+    public function getEntityManager()
     {
-        return $this->em;
+        return $this->entityManager;
     }
 }
