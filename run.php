@@ -9,26 +9,49 @@ $autoload = require_once __DIR__ . '/vendor/autoload.php';
 $autoload->add('Fixture', __DIR__ . '/test/');
 echo "==============================================================\n\n";
 
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Fixture\User;
 use Granula\EntityManager;
 use Granula\EventManager;
+
+$config = new \Doctrine\DBAL\Configuration();
+
+class SQLLogger implements \Doctrine\DBAL\Logging\SQLLogger
+{
+    public function startQuery($sql, array $params = null, array $types = null)
+    {
+        echo "• $sql · " . json_encode($params) . "\n";
+    }
+
+    public function stopQuery()
+    {
+    }
+}
+
+$config->setSQLLogger(new SQLLogger());
 
 $evm = new EventManager();
 $evm->addEventListener(EntityManager\Events::preUpdateSchema, function () {
     $sql = EntityManager::getInstance()->getSchemaTool()->getUpdateSchemaSql();
 });
 
+$connection = DriverManager::getConnection(
+    [
+        'driver' => 'pdo_mysql',
+        'host' => 'localhost',
+        'user' => 'root',
+        'password' => '',
+        'dbname' => 'granula',
+        'charset' => 'utf8'
+    ],
+    $config,
+    $evm
+);
+
 $params = [
     'dev' => true,
-    'event_manager' => $evm,
-
-    'driver' => 'pdo_mysql',
-    'host' => 'localhost',
-    'user' => 'root',
-    'password' => '',
-    'dbname' => 'granula',
-    'charset' => 'utf8'
+    'connection' => $connection,
 ];
 
 $em = new EntityManager($params, [
@@ -38,7 +61,7 @@ $em = new EntityManager($params, [
 //$user = User::find(1);
 
 /** @var $res Generator */
-$result = User::query('SELECT * FROM users u WHERE u.id = ?', [2], function ($row) {
+$result = User::query('SELECT * FROM users u WHERE u.id = ?', [1], function ($row) {
     $user = new User();
     $user->setId($row['id']);
     $user->setName($row['name']);
@@ -48,5 +71,6 @@ $result = User::query('SELECT * FROM users u WHERE u.id = ?', [2], function ($ro
     return $user;
 });
 
-$user = $result->current();
-var_dump($user);
+foreach ($result as $user) {
+    var_dump($user);
+}

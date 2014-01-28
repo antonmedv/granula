@@ -35,7 +35,8 @@ trait Repository
         $query = $em->getConnection()->prepare($sql);
         $query->execute($params);
 
-        $row = $query->fetch();
-        yield false === $row ? null : $map($row);
+        while ($result = $query->fetch()) {
+            yield $map($result);
+        }
     }
 }

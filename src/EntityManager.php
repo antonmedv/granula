@@ -28,11 +28,6 @@ class EntityManager
     private $connection;
 
     /**
-     * @var EventManager
-     */
-    private $eventManager;
-
-    /**
      * @var Cache
      */
     private $cache;
@@ -65,19 +60,19 @@ class EntityManager
             $this->cache = new ArrayCache();
         }
 
-        if (isset($params['event_manager'])) {
-            $this->eventManager = $params['event_manager'];
-            unset($params['event_manager']);
-        } else {
-            $this->eventManager = new EventManager();
-        }
-
         if (isset($params['connection'])) {
             $connection = $params['connection'];
             unset($params['connection']);
         } else {
+            if (isset($params['event_manager'])) {
+                $eventManager = $params['event_manager'];
+                unset($params['event_manager']);
+            } else {
+                $eventManager = new EventManager();
+            }
+
             $config = new Configuration();
-            $connection = DriverManager::getConnection($params, $config, $this->eventManager);
+            $connection = DriverManager::getConnection($params, $config, $eventManager);
         }
 
         $this->connection = $connection;
@@ -86,11 +81,11 @@ class EntityManager
         self::setInstance($this);
 
         if ($this->dev) {
-            $this->eventManager->dispatchEvent(Events::preUpdateSchema, new EntityManagerEventArgs($this));
+            $this->getEventManager()->dispatchEvent(Events::preUpdateSchema, new EntityManagerEventArgs($this));
 
             $this->getSchemaTool()->updateSchema();
 
-            $this->eventManager->dispatchEvent(Events::postUpdateSchema, new EntityManagerEventArgs($this));
+            $this->getEventManager()->dispatchEvent(Events::postUpdateSchema, new EntityManagerEventArgs($this));
         }
     }
 
@@ -138,6 +133,14 @@ class EntityManager
     public function getClasses()
     {
         return $this->classes;
+    }
+
+    /**
+     * @return EventManager
+     */
+    public function getEventManager()
+    {
+        return $this->connection->getEventManager();
     }
 
     /**

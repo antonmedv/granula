@@ -51,6 +51,11 @@ class User
         $meta->index(['name', 'email'], 'name_email_index');
     }
 
+    function __toString()
+    {
+        return "User ".$this->name;
+    }
+
     /**
      * @param string $avatar
      */
