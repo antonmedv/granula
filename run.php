@@ -15,43 +15,24 @@ use Fixture\User;
 use Granula\EntityManager;
 use Granula\EventManager;
 
-$config = new \Doctrine\DBAL\Configuration();
-
-class SQLLogger implements \Doctrine\DBAL\Logging\SQLLogger
-{
-    public function startQuery($sql, array $params = null, array $types = null)
-    {
-        echo "• $sql · " . json_encode($params) . "\n";
-    }
-
-    public function stopQuery()
-    {
-    }
-}
-
-$config->setSQLLogger(new SQLLogger());
-
 $evm = new EventManager();
 $evm->addEventListener(EntityManager\Events::preUpdateSchema, function () {
     $sql = EntityManager::getInstance()->getSchemaTool()->getUpdateSchemaSql();
 });
 
-$connection = DriverManager::getConnection(
-    [
-        'driver' => 'pdo_mysql',
-        'host' => 'localhost',
-        'user' => 'root',
-        'password' => '',
-        'dbname' => 'granula',
-        'charset' => 'utf8'
-    ],
-    $config,
-    $evm
-);
-
 $params = [
     'dev' => true,
-    'connection' => $connection,
+    'event_manager' => $evm,
+    'sql_logger' => function ($sql, $params = []) {
+            echo "• $sql · " . json_encode($params) . "\n";
+        },
+
+    'driver' => 'pdo_mysql',
+    'host' => 'localhost',
+    'user' => 'root',
+    'password' => '',
+    'dbname' => 'granula',
+    'charset' => 'utf8'
 ];
 
 $em = new EntityManager($params, [

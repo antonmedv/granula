@@ -12,8 +12,10 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Logging\SQLLogger;
 use Granula\EntityManager\EntityManagerEventArgs;
 use Granula\EntityManager\Events;
+use Granula\EntityManager\SQLLoggerClosure;
 
 class EntityManager
 {
@@ -40,7 +42,7 @@ class EntityManager
     /**
      * @var bool
      */
-    private $dev;
+    private $dev = false;
 
     /**
      * @param array $params
@@ -64,6 +66,19 @@ class EntityManager
             $connection = $params['connection'];
             unset($params['connection']);
         } else {
+            $config = new Configuration();
+
+            if (isset($params['sql_logger'])) {
+
+                if ($params['sql_logger'] instanceof \Closure) {
+                    $config->setSQLLogger(new SQLLoggerClosure($params['sql_logger']));
+                } else if ($params['sql_logger'] instanceof SQLLogger) {
+                    $config->setSQLLogger($params['sql_logger']);
+                }
+
+                unset($params['sql_logger']);
+            }
+
             if (isset($params['event_manager'])) {
                 $eventManager = $params['event_manager'];
                 unset($params['event_manager']);
@@ -71,7 +86,6 @@ class EntityManager
                 $eventManager = new EventManager();
             }
 
-            $config = new Configuration();
             $connection = DriverManager::getConnection($params, $config, $eventManager);
         }
 
