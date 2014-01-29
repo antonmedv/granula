@@ -13,7 +13,12 @@ use Granula\Meta\Index;
 class Meta
 {
     private $table;
+
+    /**
+     * @var Field[]
+     */
     private $fields = [];
+
     private $indexes = [];
 
     public function table($table)
@@ -34,6 +39,22 @@ class Meta
     public function getTable()
     {
         return $this->table;
+    }
+
+    public function getAlias()
+    {
+        return $this->table[0];
+    }
+
+    public function getPrimaryField()
+    {
+        foreach ($this->fields as $field) {
+            if ($field->isPrimary()) {
+                return $field;
+            }
+        }
+
+        throw new \RuntimeException('Entity does not contain primary field.');
     }
 
     /**

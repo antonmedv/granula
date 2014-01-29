@@ -62,7 +62,7 @@ class Field
     /**
      * @return boolean
      */
-    public function getPrimary()
+    public function isPrimary()
     {
         return $this->primary;
     }
@@ -78,7 +78,7 @@ class Field
     /**
      * @return boolean
      */
-    public function getUnique()
+    public function isUnique()
     {
         return $this->unique;
     }

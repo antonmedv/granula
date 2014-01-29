@@ -14,10 +14,14 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Fixture\User;
 use Granula\EntityManager;
 use Granula\EventManager;
+use Granula\Mapper\ResultMapper;
 
 $evm = new EventManager();
 $evm->addEventListener(EntityManager\Events::preUpdateSchema, function () {
-    $sql = EntityManager::getInstance()->getSchemaTool()->getUpdateSchemaSql();
+    if (!empty($sql = EntityManager::getInstance()->getSchemaTool()->getUpdateSchemaSql())) {
+        echo "UPDATE SCHEMA:\n";
+        var_dump($sql);
+    }
 });
 
 $params = [
@@ -39,18 +43,10 @@ $em = new EntityManager($params, [
     User::class,
 ]);
 
-//$user = User::find(1);
+$user = User::find(1);
+var_dump($user);
 
-/** @var $res Generator */
-$result = User::query('SELECT * FROM users u WHERE u.id = ?', [1], function ($row) {
-    $user = new User();
-    $user->setId($row['id']);
-    $user->setName($row['name']);
-    $user->setPassword($row['password']);
-    $user->setEmail($row['email']);
-    $user->setAvatar($row['avatar']);
-    return $user;
-});
+$result = User::query('SELECT *, MAX(u.id) as max FROM users u WHERE u.id IN (?, ?)', [1, 2]);
 
 foreach ($result as $user) {
     var_dump($user);

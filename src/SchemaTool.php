@@ -106,11 +106,11 @@ class SchemaTool
             foreach ($meta->getFields() as $field) {
                 $table->addColumn($field->getName(), $field->getTypeName(), $field->getOptions());
 
-                if ($field->getPrimary()) {
+                if ($field->isPrimary()) {
                     $primaryKeys[] = $field->getName();
                 }
 
-                if ($field->getUnique()) {
+                if ($field->isUnique()) {
                     $uniqueKeys[] = $field->getName();
                 }
             }
