@@ -8,11 +8,11 @@
 namespace Fixture;
 
 use Granula\Meta;
-use Granula\Repository;
+use Granula\ActiveRecord;
 
 class User
 {
-    use Repository;
+    use ActiveRecord;
 
     /**
      * @var integer

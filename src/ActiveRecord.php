@@ -10,7 +10,7 @@ namespace Granula;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Granula\Mapper\ResultMapper;
 
-trait Repository
+trait ActiveRecord
 {
     /**
      * @param string $sql
