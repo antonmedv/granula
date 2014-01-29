@@ -15,10 +15,11 @@ trait Repository
     /**
      * @param string $sql
      * @param array $params
+     * @param array $types
      * @param callable $map
      * @return \Generator
      */
-    public static function query($sql, $params = [], \Closure $map = null)
+    public static function query($sql, $params = [], $types = [], \Closure $map = null)
     {
         $em = EntityManager::getInstance();
         $class = get_called_class();
@@ -45,13 +46,52 @@ trait Repository
             };
         }
 
-        $query = $em->getConnection()->prepare($sql);
-        $query->execute($params);
+        $query = $em->getConnection()->executeQuery($sql, $params, $types);
 
         while ($result = $query->fetch()) {
             yield $map($result);
         }
     }
+
+    /**
+     *  Update row.
+     */
+    public function save()
+    {
+        $this->insertOrUpdate(false);
+    }
+
+    /**
+     * Insert new row.
+     */
+    public function create()
+    {
+        $this->insertOrUpdate(true);
+    }
+
+    /**
+     * @param bool $isNewEntity Insert or update row.
+     */
+    private function insertOrUpdate($isNewEntity)
+    {
+        $meta = self::meta();
+        $em = EntityManager::getInstance();
+        $conn = $em->getConnection();
+        $primary = $meta->getPrimaryField()->getName();
+
+        $data = [];
+        foreach ($meta->getFields() as $name => $field) {
+            $data[$name] = $this->$name;
+        }
+
+        if ($isNewEntity) {
+            $conn->insert($meta->getTable(), $data);
+            $this->$primary = $conn->lastInsertId();
+        } else {
+            $conn->update($meta->getTable(), $data, [$primary => $this->$primary]);
+        }
+    }
+
 
     /**
      * @return \Generator

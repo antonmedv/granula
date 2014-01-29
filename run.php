@@ -9,6 +9,7 @@ $autoload = require_once __DIR__ . '/vendor/autoload.php';
 $autoload->add('Fixture', __DIR__ . '/test/');
 echo "==============================================================\n\n";
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Fixture\User;
@@ -44,10 +45,20 @@ $em = new EntityManager($params, [
 ]);
 
 $user = User::find(1);
+$user->setPassword('new_password');
+$user->save();
 var_dump($user);
 
-$result = User::query('SELECT *, MAX(u.id) as max FROM users u WHERE u.id IN (?, ?)', [1, 2]);
+$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
 
 foreach ($result as $user) {
     var_dump($user);
 }
+
+//$user = new User();
+//$user->setName('Ol\'a');
+//$user->setEmail('opazdalkina@medvedev.be');
+//$user->setPassword('1234');
+//$user->setAvatar(null);
+////$user->create();
+//var_dump($user);
