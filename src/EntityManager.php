@@ -163,7 +163,7 @@ class EntityManager
      */
     public function getMetaForClass($class)
     {
-        $meta = new Meta();
+        $meta = new Meta($class);
         $class::describe($meta);
 
         return $meta;
@@ -175,7 +175,7 @@ class EntityManager
     public function getMetaForAllClasses()
     {
         foreach ($this->classes as $class) {
-            yield $this->getMetaForClass($class);
+            yield $class => $this->getMetaForClass($class);
         }
     }
 

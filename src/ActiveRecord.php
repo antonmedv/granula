@@ -22,11 +22,12 @@ trait ActiveRecord
     public static function query($sql, $params = [], $types = [], \Closure $map = null)
     {
         $em = EntityManager::getInstance();
+        $conn = $em->getConnection();
         $class = get_called_class();
         $meta = $em->getMetaForClass($class);
 
         if (null === $map) {
-            $map = function ($result) use ($class, $meta) {
+            $map = function ($result) use ($class, $meta, $conn) {
                 $rm = new ResultMapper($class);
 
                 $columnsToMap = [];
@@ -36,7 +37,7 @@ trait ActiveRecord
                     $rm->addField($column);
 
                     // Collect columns what will be mapped
-                    $columnsToMap[$column] = $result[$column];
+                    $columnsToMap[$column] = $field->getType()->convertToPHPValue($result[$column], $conn->getDatabasePlatform());
                     unset($result[$column]);
                 }
 
@@ -46,7 +47,7 @@ trait ActiveRecord
             };
         }
 
-        $query = $em->getConnection()->executeQuery($sql, $params, $types);
+        $query = $conn->executeQuery($sql, $params, $types);
 
         while ($result = $query->fetch()) {
             yield $map($result);
@@ -81,7 +82,7 @@ trait ActiveRecord
 
         $data = [];
         foreach ($meta->getFields() as $name => $field) {
-            $data[$name] = $this->$name;
+            $data[$name] = $field->getType()->convertToDatabaseValue($this->$name, $conn->getDatabasePlatform());
         }
 
         if ($isNewEntity) {

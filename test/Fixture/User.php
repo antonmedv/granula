@@ -39,6 +39,16 @@ class User
      */
     protected $avatar;
 
+    /**
+     * @var Profile
+     */
+    protected $profile;
+
+    /**
+     * @var \DateTime
+     */
+    public $date;
+
     public static function describe(Meta $meta)
     {
         $meta->table('users');
@@ -48,6 +58,8 @@ class User
         //$meta->field('plain_password', 'string');
         $meta->field('email', 'string')->unique()->options(['notnull' => true]);
         $meta->field('avatar', 'string')->options(['notnull' => false, 'default' => '']);
+        //$meta->field('profile')->hasOne(Profile::class);
+        $meta->field('date', 'datetime');
         $meta->index(['name', 'email'], 'name_email_index');
     }
 

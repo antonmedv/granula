@@ -12,6 +12,14 @@ use Granula\Meta\Index;
 
 class Meta
 {
+    /**
+     * @var string
+     */
+    private $class;
+
+    /**
+     * @var string
+     */
     private $table;
 
     /**
@@ -19,14 +27,22 @@ class Meta
      */
     private $fields = [];
 
+    /**
+     * @var Index[]
+     */
     private $indexes = [];
+
+    public function __construct($class)
+    {
+        $this->class = $class;
+    }
 
     public function table($table)
     {
         $this->table = $table;
     }
 
-    public function field($name, $type)
+    public function field($name, $type = null)
     {
         return $this->fields[$name] = new Field($name, $type);
     }
@@ -34,6 +50,11 @@ class Meta
     public function index($columns, $name)
     {
         return $this->indexes[$name] = new Index($columns, $name);
+    }
+
+    public function getClass()
+    {
+        return $this->class;
     }
 
     public function getTable()

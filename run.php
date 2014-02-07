@@ -12,6 +12,7 @@ echo "==============================================================\n\n";
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Fixture\Profile;
 use Fixture\User;
 use Granula\EntityManager;
 use Granula\EventManager;
@@ -42,18 +43,22 @@ $params = [
 
 $em = new EntityManager($params, [
     User::class,
+    Profile::class,
 ]);
 
+/** @var $user User */
 $user = User::find(1);
-$user->setPassword('new_password');
-$user->save();
+
+//$user->date = new DateTime('now');
+//$user->save();
+
 var_dump($user);
 
-$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
+/*$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
 
 foreach ($result as $user) {
     var_dump($user);
-}
+}*/
 
 //$user = new User();
 //$user->setName('Ol\'a');

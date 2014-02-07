@@ -7,6 +7,8 @@
 
 namespace Granula\Meta;
 
+use Doctrine\DBAL\Types\Type;
+
 class Field
 {
     private $name;
@@ -43,6 +45,12 @@ class Field
         return $this;
     }
 
+    public function hasOne($class)
+    {
+        $this->hasOne = $class;
+        return $this;
+    }
+
     /**
      * @return mixed
      */
@@ -73,6 +81,14 @@ class Field
     public function getTypeName()
     {
         return $this->typeName;
+    }
+
+    /**
+     * @return Type
+     */
+    public function getType()
+    {
+        return Type::getType($this->typeName);
     }
 
     /**

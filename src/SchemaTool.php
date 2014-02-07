@@ -97,9 +97,12 @@ class SchemaTool
     {
         $schema = new Schema();
 
-        foreach ($this->em->getMetaForAllClasses() as $meta) {
+        $tables = [];
 
-            $table = $schema->createTable($meta->getTable());
+        // Create all tables and save them to $tables.
+        foreach ($this->em->getMetaForAllClasses() as $class => $meta) {
+
+            $tables[$class] = $table = $schema->createTable($meta->getTable());
             $primaryKeys = [];
             $uniqueKeys = [];
 
