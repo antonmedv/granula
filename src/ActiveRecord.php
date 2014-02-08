@@ -129,16 +129,17 @@ trait ActiveRecord
             $class = $field->getEntityClass();
             /** @var $entityMeta Meta */
             $entityMeta = $class::meta();
+            $alias = $field->getName();
 
-            $qb->addSelect($entityMeta->getJoinSelect($field));
-            $qb->leftJoin($meta->getAlias(), $entityMeta->getTable(), $entityMeta->getAlias(),
+            $qb->addSelect($entityMeta->getSelect($alias));
+            $qb->leftJoin($meta->getAlias(), $entityMeta->getTable(), $alias,
                 $qb->expr()->eq(
                     $meta->getAlias() . '.' . $field->getName(),
-                    $entityMeta->getPrimaryFieldNameWithAlias()
+                    $entityMeta->getPrimaryFieldNameWithAlias($alias)
                 )
             );
 
-            $mapper->addJoinedEntity($field, $entityMeta);
+            $mapper->addJoinedEntity($field, $entityMeta, $alias);
         }
 
         $result = self::query($qb->getSQL(), [$id], [\PDO::PARAM_INT], $mapper);

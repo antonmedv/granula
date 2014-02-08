@@ -64,7 +64,7 @@ class User
         $meta->field('email', 'string')->unique()->options(['notnull' => true]);
         $meta->field('avatar', 'string')->options(['notnull' => false, 'default' => '']);
         $meta->field('profile', 'entity')->entity(Profile::class);
-        //$meta->field('friend', 'entity')->entity(User::class);
+        $meta->field('friend', 'entity')->entity(User::class);
         $meta->field('date', 'datetime');
         $meta->index(['name', 'email'], 'name_email_index');
     }

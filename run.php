@@ -47,7 +47,7 @@ $em = new EntityManager($params, [
 ]);
 
 $user = User::find(1);
-var_dump($user);
+print_r($user);
 
 //$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
 //

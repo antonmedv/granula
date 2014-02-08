@@ -128,31 +128,29 @@ class Meta
     /**
      * @return string
      */
-    public function getPrimaryFieldNameWithAlias()
+    public function getPrimaryFieldNameWithAlias($alias = null)
     {
-        return $this->getAlias() . '.' . $this->getPrimaryField()->getName();
+        return
+            ($alias === null ? $this->getAlias() : $alias)
+            . '.'
+            . $this->getPrimaryField()->getName();
     }
 
-    public function getSelect($prefix = '')
+    public function getSelect($alias = null)
     {
         $select = [];
 
         foreach ($this->fields as $field) {
-            $select[] = $this->getAlias()
+            $select[] =
+                ($alias === null ? $this->getAlias() : $alias)
                 . '.'
                 . $field->getName()
                 . ' AS '
-                . $prefix
-                . $this->getAlias()
+                . ($alias === null ? $this->getAlias() : $alias)
                 . '_'
                 . $field->getName();
         }
 
         return $select;
-    }
-
-    public function getJoinSelect(Field $field)
-    {
-        return $this->getSelect($field->getName() . '_');
     }
 }

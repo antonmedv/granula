@@ -14,7 +14,7 @@ use Granula\Type\EntityType;
 class ResultMapper
 {
     /**
-     * @var array
+     * @var EntityMap[]
      */
     private $map = [];
 
@@ -42,33 +42,36 @@ class ResultMapper
         $this->rootEntityMeta = $rootMeta;
     }
 
-    public function addJoinedEntity(Field $field, Meta $joinedMeta)
+    public function addJoinedEntity(Field $field, Meta $joinedMeta, $alias)
     {
-        $this->joinedEntityMeta[] = [$field, $joinedMeta];
+        $this->joinedEntityMeta[] = [$field, $joinedMeta, $alias];
+        $this->joins[$alias] = $field->getName();
     }
 
     public function createMap()
     {
         $this->map = [];
 
-        $rootMap = [];
+        $rootMap = new EntityMap($this->rootEntityMeta->getClass(), $this->rootEntityMeta->getAlias());
         foreach ($this->rootEntityMeta->getFields() as $field) {
             $column = $this->rootEntityMeta->getAlias() . '_' . $field->getName();
-            $rootMap[] = [$field, $column];
+            $rootMap->addField($field, $column);
         }
-        $this->map[$this->rootEntityMeta->getAlias()] = [$this->rootEntityMeta->getClass(), $rootMap];
+        $this->map[] = $rootMap;
 
 
-        foreach ($this->joinedEntityMeta as list($joinField, $joinMeta)) {
-            $joinMap = [];
+        foreach ($this->joinedEntityMeta as $list) {
+            /** @var $joinField Field */
+            /** @var $joinMeta Meta */
+            list($joinField, $joinMeta, $alias) = $list;
+
+            $joinMap = new EntityMap($joinMeta->getClass(), $alias);
             foreach ($joinMeta->getFields() as $field) {
-                $column = $joinField->getName() . '_' . $joinMeta->getAlias() . '_' . $field->getName();
-                $joinMap[] = [$field, $column];
+                $column = $alias . '_' . $field->getName();
+                $joinMap->addField($field, $column);
             }
 
-            $alias = $joinField->getName() . '_' . $joinMeta->getAlias();
-            $this->map[$alias] = [$joinMeta->getClass(), $joinMap];
-            $this->joins[] = [$this->rootEntityMeta->getAlias(), $joinField, $alias];
+            $this->map[] = $joinMap;
         }
     }
 
@@ -81,14 +84,12 @@ class ResultMapper
         $entities = [];
         $reflections = [];
 
-        foreach ($this->map as $alias => $at) {
-            list($class, $map) = $at;
-
-            $rc = new \ReflectionClass($class);
+        foreach ($this->map as $entityMap) {
+            $rc = new \ReflectionClass($entityMap->getClass());
             $entity = $rc->newInstance();
 
             /** @var $field Field */
-            foreach ($map as list($field, $column)) {
+            foreach ($entityMap->getMap() as list($field, $column)) {
                 if (!isset($result[$column])) {
                     continue;
                 }
@@ -98,15 +99,17 @@ class ResultMapper
                 $this->setEntityValue($entity, $field->getName(), $value, $rc);
             }
 
-            $entities[$alias] = $entity;
-            $reflections[$alias] = $rc;
+            $entities[$entityMap->getAlias()] = $entity;
+            $reflections[$entityMap->getAlias()] = $rc;
         }
 
-        foreach ($this->joins as list($alias, $field, $to)) {
-            $this->setEntityValue($entities[$alias], $field->getName(), $entities[$to], $reflections[$alias]);
+        $root = $entities[$this->rootEntityMeta->getAlias()];
+
+        foreach ($this->joins as $alias => $fieldName) {
+            $this->setEntityValue($root, $fieldName, $entities[$alias], $reflections[$this->rootEntityMeta->getAlias()]);
         }
 
-        return $entities[$this->rootEntityMeta->getAlias()];
+        return $root;
     }
 
     private function setEntityValue($entity, $fieldName, $value, \ReflectionClass $class)

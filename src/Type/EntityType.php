@@ -41,7 +41,7 @@ class EntityType extends Type
         $class = $this->entityClassName;
         //return $class::find((int)$value);
         // @TODO Lazy loading
-        return $class;
+        return "LAZY($class)#$value";
     }
 
     /**
