@@ -46,13 +46,8 @@ $em = new EntityManager($params, [
     Profile::class,
 ]);
 
-/** @var $user User */
-//$user = User::find(1);
-
-//$user->date = new DateTime('now');
-//$user->save();
-
-//var_dump($user);
+$user = User::find(1);
+var_dump($user);
 
 //$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
 //

@@ -39,7 +39,7 @@ class EntityType extends Type
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         $class = $this->entityClassName;
-        return $class::find($value);
+        return $class::find((int)$value);
     }
 
     /**
