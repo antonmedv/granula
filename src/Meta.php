@@ -125,4 +125,34 @@ class Meta
         return $this->fieldsWhatHasEntities;
     }
 
+    /**
+     * @return string
+     */
+    public function getPrimaryFieldNameWithAlias()
+    {
+        return $this->getAlias() . '.' . $this->getPrimaryField()->getName();
+    }
+
+    public function getSelect($prefix = '')
+    {
+        $select = [];
+
+        foreach ($this->fields as $field) {
+            $select[] = $this->getAlias()
+                . '.'
+                . $field->getName()
+                . ' AS '
+                . $prefix
+                . $this->getAlias()
+                . '_'
+                . $field->getName();
+        }
+
+        return $select;
+    }
+
+    public function getJoinSelect(Field $field)
+    {
+        return $this->getSelect($field->getName() . '_');
+    }
 }

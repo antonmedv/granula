@@ -33,6 +33,7 @@ class Field
     public function primary()
     {
         $this->primary = true;
+        $this->options['autoincrement'] = true;
         return $this;
     }
 

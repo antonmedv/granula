@@ -7,6 +7,7 @@
 
 namespace Fixture;
 
+use Doctrine\DBAL\Types\Type;
 use Granula\ActiveRecord;
 use Granula\Meta;
 
@@ -15,12 +16,18 @@ class Profile
     use ActiveRecord;
 
     public $id;
-    public $user_id;
+    public $city;
+    public $date;
+    public $age;
+    public $tags;
 
     public static function describe(Meta $meta)
     {
         $meta->table('profile');
-        $meta->field('id', 'integer')->primary()->options(['autoincrement' => true]);
-        $meta->field('user_id', 'string');
+        $meta->field('id', 'integer')->primary();
+        $meta->field('city', 'string');
+        $meta->field('date', 'datetime');
+        $meta->field('age', Type::INTEGER);
+        $meta->field('tags', Type::SIMPLE_ARRAY);
     }
 } 

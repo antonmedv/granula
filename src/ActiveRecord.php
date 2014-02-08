@@ -8,6 +8,7 @@
 namespace Granula;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Granula\Mapper\Mapper;
 use Granula\Mapper\ResultMapper;
 use Granula\Type\EntityType;
 
@@ -20,32 +21,20 @@ trait ActiveRecord
      * @param callable $map
      * @return \Generator
      */
-    public static function query($sql, $params = [], $types = [], \Closure $map = null)
+    public static function query($sql, $params = [], $types = [], $map = null)
     {
         $em = EntityManager::getInstance();
         $conn = $em->getConnection();
-        $class = get_called_class();
-        $meta = $em->getMetaForClass($class);
 
-        // Create map function for current meta class.
+        // Use mapper for current meta class.
         if (null === $map) {
-            $map = function ($result) use ($class, $meta, $conn) {
-                $rm = new ResultMapper($class);
-
-                $columnsToMap = [];
-
-                foreach ($meta->getFields() as $field) {
-                    $column = $field->getName();
-                    $rm->addField($column);
-
-                    // Collect columns what will be mapped
-                    $columnsToMap[$column] = $field->getType()->convertToPHPValue($result[$column], $conn->getDatabasePlatform());
-                    unset($result[$column]);
-                }
-
-                $entity = $rm->map($columnsToMap);
-
-                return empty($result) ? $entity : [$entity, $result];
+            $map = function ($result) {
+                return $result;
+            };
+        } elseif ($map instanceof ResultMapper) {
+            $mapper = $map;
+            $map = function ($result) use ($mapper, $conn) {
+                return $mapper->map($result, $conn->getDatabasePlatform());
             };
         }
 
@@ -105,7 +94,7 @@ trait ActiveRecord
         $qb = self::createQueryBuilder();
 
         $qb
-            ->select('*')
+            ->select($meta->getSelect())
             ->from($meta->getTable(), $meta->getAlias());
 
         return self::query($qb->getSQL());
@@ -122,18 +111,37 @@ trait ActiveRecord
         }
 
         $meta = self::meta();
+        $mapper = new ResultMapper();
         $qb = self::createQueryBuilder();
 
         $qb
-            ->select('*')
+            ->select($meta->getSelect())
             ->from($meta->getTable(), $meta->getAlias())
             ->where($qb->expr()->eq(
-                $meta->getPrimaryField()->getName(),
+                $meta->getPrimaryFieldNameWithAlias(),
                 '?'
             ))
             ->setMaxResults(1);
 
-        $result = self::query($qb->getSQL(), [$id]);
+        $mapper->setRootEntity($meta);
+
+        foreach ($meta->getFieldsWhatHasEntities() as $field) {
+            $class = $field->getEntityClass();
+            /** @var $entityMeta Meta */
+            $entityMeta = $class::meta();
+
+            $qb->addSelect($entityMeta->getJoinSelect($field));
+            $qb->leftJoin($meta->getAlias(), $entityMeta->getTable(), $entityMeta->getAlias(),
+                $qb->expr()->eq(
+                    $meta->getAlias() . '.' . $field->getName(),
+                    $entityMeta->getPrimaryFieldNameWithAlias()
+                )
+            );
+
+            $mapper->addJoinedEntity($field, $entityMeta);
+        }
+
+        $result = self::query($qb->getSQL(), [$id], [\PDO::PARAM_INT], $mapper);
         return $result->valid() ? $result->current() : null;
     }
 

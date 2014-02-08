@@ -45,6 +45,11 @@ class User
     public $profile;
 
     /**
+     * @var User
+     */
+    public $friend;
+
+    /**
      * @var \DateTime
      */
     public $date;
@@ -58,7 +63,8 @@ class User
         //$meta->field('plain_password', 'string');
         $meta->field('email', 'string')->unique()->options(['notnull' => true]);
         $meta->field('avatar', 'string')->options(['notnull' => false, 'default' => '']);
-        $meta->field('profile', 'entity')->hasOne(Profile::class);
+        $meta->field('profile', 'entity')->entity(Profile::class);
+        //$meta->field('friend', 'entity')->entity(User::class);
         $meta->field('date', 'datetime');
         $meta->index(['name', 'email'], 'name_email_index');
     }
