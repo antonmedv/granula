@@ -46,14 +46,32 @@ $em = new EntityManager($params, [
     Profile::class,
 ]);
 
-$user = User::find(1);
-print_r($user);
+//$user = User::find(1);
+//print_r($user);
 
-//$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
-//
-//foreach ($result as $user) {
-//    var_dump($user);
+//$users = User::query('SELECT * FROM users u WHERE u.id > ?', [1], [\PDO::PARAM_INT], function ($result) {
+//    $user = new User();
+//    $user->id = $result['id'];
+//    $user->name = $result['name'];
+//    $user->email = $result['email'];
+//    $user->profile = Profile::find($result['profile']);
+//    return $user;
+//});
+//foreach($users as $user) {
+//    print_r($user);
 //}
+
+$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
+
+/** @var $user User */
+foreach ($result as $user) {
+    $p = $user->getProfile();
+    print_r($p);
+    if($p instanceof Profile) {
+        $u = $p->getUser()->getProfile()->getUser()->getProfile()->getUser()->getProfile()->getUser()->getProfile()->getUser();
+        print_r($u);
+    }
+}
 
 //$profile = new Profile();
 //$profile->user_id = 12344;

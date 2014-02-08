@@ -17,27 +17,27 @@ class User
     /**
      * @var integer
      */
-    protected $id;
+    public $id;
 
     /**
      * @var string
      */
-    protected $name;
+    public $name;
 
     /**
      * @var string
      */
-    protected $password;
+    public $password;
 
     /**
      * @var string
      */
-    protected $email;
+    public $email;
 
     /**
      * @var string
      */
-    protected $avatar;
+    public $avatar;
 
     /**
      * @var Profile
@@ -153,6 +153,17 @@ class User
     {
         return $this->password;
     }
+
+    /**
+     * @return \Fixture\Profile
+     */
+    public function getProfile()
+    {
+        $this->load('profile');
+        return $this->profile;
+    }
+
+
 
 
 } 

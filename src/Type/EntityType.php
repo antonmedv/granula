@@ -9,6 +9,7 @@ namespace Granula\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use Granula\Lazy;
 
 class EntityType extends Type
 {
@@ -38,10 +39,7 @@ class EntityType extends Type
 
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        $class = $this->entityClassName;
-        //return $class::find((int)$value);
-        // @TODO Lazy loading
-        return "LAZY($class)#$value";
+        return new Lazy($this->entityClassName, (int)$value);
     }
 
     /**

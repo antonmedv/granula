@@ -28,8 +28,13 @@ trait ActiveRecord
 
         // Use mapper for current meta class.
         if (null === $map) {
-            $map = function ($result) {
-                return $result;
+            $class = get_called_class();
+
+            $mapper = new ResultMapper();
+            $mapper->setRootEntity($class::meta(), false);
+
+            $map = function ($result) use ($mapper, $conn) {
+                return $mapper->map($result, $conn->getDatabasePlatform());
             };
         } elseif ($map instanceof ResultMapper) {
             $mapper = $map;
@@ -162,5 +167,14 @@ trait ActiveRecord
     {
         $em = EntityManager::getInstance();
         return $em->getMetaForClass(get_called_class());
+    }
+
+    public function load($field)
+    {
+        $lazy = $this->$field;
+
+        if ($lazy instanceof Lazy) {
+            $this->$field = $lazy->load();
+        }
     }
 }

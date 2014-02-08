@@ -10,6 +10,7 @@ namespace Fixture;
 use Doctrine\DBAL\Types\Type;
 use Granula\ActiveRecord;
 use Granula\Meta;
+use Granula\Type\EntityType;
 
 class Profile
 {
@@ -20,6 +21,7 @@ class Profile
     public $date;
     public $age;
     public $tags;
+    public $user;
 
     public static function describe(Meta $meta)
     {
@@ -29,5 +31,15 @@ class Profile
         $meta->field('date', 'datetime');
         $meta->field('age', Type::INTEGER);
         $meta->field('tags', Type::SIMPLE_ARRAY);
+        $meta->field('user', EntityType::name)->entity(User::class);
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        $this->load('user');
+        return $this->user;
     }
 } 

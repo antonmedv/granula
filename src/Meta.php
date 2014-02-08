@@ -126,6 +126,15 @@ class Meta
     }
 
     /**
+     * @param string $fieldName
+     * @return Field
+     */
+    public function getFieldByName($fieldName)
+    {
+        return $this->fields[$fieldName];
+    }
+
+    /**
      * @return string
      */
     public function getPrimaryFieldNameWithAlias($alias = null)
@@ -153,4 +162,6 @@ class Meta
 
         return $select;
     }
+
+
 }

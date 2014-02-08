@@ -33,13 +33,16 @@ class ResultMapper
      */
     private $joinedEntityMeta = [];
 
+    private $useAs;
+
     public function __construct()
     {
     }
 
-    public function setRootEntity(Meta $rootMeta)
+    public function setRootEntity(Meta $rootMeta, $useAs = true)
     {
         $this->rootEntityMeta = $rootMeta;
+        $this->useAs = $useAs;
     }
 
     public function addJoinedEntity(Field $field, Meta $joinedMeta, $alias)
@@ -54,7 +57,7 @@ class ResultMapper
 
         $rootMap = new EntityMap($this->rootEntityMeta->getClass(), $this->rootEntityMeta->getAlias());
         foreach ($this->rootEntityMeta->getFields() as $field) {
-            $column = $this->rootEntityMeta->getAlias() . '_' . $field->getName();
+            $column = $this->useAs ? $this->rootEntityMeta->getAlias() . '_' . $field->getName() : $field->getName();
             $rootMap->addField($field, $column);
         }
         $this->map[] = $rootMap;
@@ -106,10 +109,21 @@ class ResultMapper
         $root = $entities[$this->rootEntityMeta->getAlias()];
 
         foreach ($this->joins as $alias => $fieldName) {
-            $this->setEntityValue($root, $fieldName, $entities[$alias], $reflections[$this->rootEntityMeta->getAlias()]);
+            $rc = $reflections[$this->rootEntityMeta->getAlias()];
+            $current = $this->getEntityValue($root, $fieldName, $rc);
+            if (null !== $current) {
+                $this->setEntityValue($root, $fieldName, $entities[$alias], $rc);
+            }
         }
 
         return $root;
+    }
+
+    private function getEntityValue($entity, $fieldName, \ReflectionClass $class)
+    {
+        $property = $class->getProperty($fieldName);
+        $property->setAccessible(true);
+        return $property->getValue($entity);
     }
 
     private function setEntityValue($entity, $fieldName, $value, \ReflectionClass $class)
