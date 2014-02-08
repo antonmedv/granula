@@ -22,7 +22,7 @@ class Field
 
     private $options = [];
 
-    private $hasOne = false;
+    private $entityClass = false;
 
     public function __construct($name, $typeName)
     {
@@ -48,9 +48,9 @@ class Field
         return $this;
     }
 
-    public function hasOne($class)
+    public function entity($class)
     {
-        $this->hasOne = $class;
+        $this->entityClass = $class;
         $this->typeName = EntityType::name;
         $this->options['notnull'] = false;
         return $this;
@@ -96,7 +96,7 @@ class Field
         $type = Type::getType($this->typeName);
 
         if ($type instanceof EntityType) {
-            $type->setEntityClassName($this->hasOne);
+            $type->setEntityClassName($this->entityClass);
         }
 
         return $type;
@@ -110,4 +110,11 @@ class Field
         return $this->unique;
     }
 
+    /**
+     * @return string
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
+    }
 }

@@ -9,6 +9,7 @@ namespace Granula;
 
 use Granula\Meta\Field;
 use Granula\Meta\Index;
+use Granula\Type\EntityType;
 
 class Meta
 {
@@ -16,6 +17,11 @@ class Meta
      * @var string
      */
     private $class;
+
+    /**
+     * @var string
+     */
+    private $alias;
 
     /**
      * @var string
@@ -32,6 +38,11 @@ class Meta
      */
     private $indexes = [];
 
+    /**
+     * @var Field[]
+     */
+    private $fieldsWhatHasEntities = [];
+
     public function __construct($class)
     {
         $this->class = $class;
@@ -40,11 +51,23 @@ class Meta
     public function table($table)
     {
         $this->table = $table;
+        $this->alias = $this->table[0];
+    }
+
+    public function alias($alias)
+    {
+        $this->alias = $alias;
     }
 
     public function field($name, $type)
     {
-        return $this->fields[$name] = new Field($name, $type);
+        $this->fields[$name] = new Field($name, $type);
+
+        if ($type === EntityType::name) {
+            $this->fieldsWhatHasEntities[$name] = $this->fields[$name];
+        }
+
+        return $this->fields[$name];
     }
 
     public function index($columns, $name)
@@ -64,7 +87,7 @@ class Meta
 
     public function getAlias()
     {
-        return $this->table[0];
+        return $this->alias;
     }
 
     public function getPrimaryField()
@@ -92,6 +115,14 @@ class Meta
     public function getIndexes()
     {
         return $this->indexes;
+    }
+
+    /**
+     * @return Field[]
+     */
+    public function getFieldsWhatHasEntities()
+    {
+        return $this->fieldsWhatHasEntities;
     }
 
 }
