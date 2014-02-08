@@ -42,7 +42,7 @@ class User
     /**
      * @var Profile
      */
-    protected $profile;
+    public $profile;
 
     /**
      * @var \DateTime
@@ -58,7 +58,7 @@ class User
         //$meta->field('plain_password', 'string');
         $meta->field('email', 'string')->unique()->options(['notnull' => true]);
         $meta->field('avatar', 'string')->options(['notnull' => false, 'default' => '']);
-        //$meta->field('profile')->hasOne(Profile::class);
+        $meta->field('profile', 'entity')->hasOne(Profile::class);
         $meta->field('date', 'datetime');
         $meta->index(['name', 'email'], 'name_email_index');
     }

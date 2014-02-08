@@ -47,23 +47,29 @@ $em = new EntityManager($params, [
 ]);
 
 /** @var $user User */
-$user = User::find(1);
+//$user = User::find(1);
 
 //$user->date = new DateTime('now');
 //$user->save();
 
-var_dump($user);
+//var_dump($user);
 
-/*$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
+//$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
+//
+//foreach ($result as $user) {
+//    var_dump($user);
+//}
 
-foreach ($result as $user) {
-    var_dump($user);
-}*/
-
+//$profile = new Profile();
+//$profile->user_id = 12344;
+//$profile->create();
+//
 //$user = new User();
-//$user->setName('Ol\'a');
-//$user->setEmail('opazdalkina@medvedev.be');
+//$user->setName('Elfet');
+//$user->setEmail('elfet@medvedev.be');
 //$user->setPassword('1234');
 //$user->setAvatar(null);
-////$user->create();
+//$user->profile = $profile;
+//$user->date = new DateTime('now');
+//$user->create();
 //var_dump($user);

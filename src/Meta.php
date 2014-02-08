@@ -42,7 +42,7 @@ class Meta
         $this->table = $table;
     }
 
-    public function field($name, $type = null)
+    public function field($name, $type)
     {
         return $this->fields[$name] = new Field($name, $type);
     }

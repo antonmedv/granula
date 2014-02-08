@@ -9,6 +9,7 @@ namespace Granula;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Granula\Mapper\ResultMapper;
+use Granula\Type\EntityType;
 
 trait ActiveRecord
 {
@@ -26,6 +27,7 @@ trait ActiveRecord
         $class = get_called_class();
         $meta = $em->getMetaForClass($class);
 
+        // Create map function for current meta class.
         if (null === $map) {
             $map = function ($result) use ($class, $meta, $conn) {
                 $rm = new ResultMapper($class);
@@ -115,6 +117,10 @@ trait ActiveRecord
      */
     public static function find($id)
     {
+        if (null === $id) {
+            return null;
+        }
+
         $meta = self::meta();
         $qb = self::createQueryBuilder();
 

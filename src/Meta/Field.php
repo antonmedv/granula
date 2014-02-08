@@ -8,6 +8,7 @@
 namespace Granula\Meta;
 
 use Doctrine\DBAL\Types\Type;
+use Granula\Type\EntityType;
 
 class Field
 {
@@ -20,6 +21,8 @@ class Field
     private $unique = false;
 
     private $options = [];
+
+    private $hasOne = false;
 
     public function __construct($name, $typeName)
     {
@@ -48,6 +51,8 @@ class Field
     public function hasOne($class)
     {
         $this->hasOne = $class;
+        $this->typeName = EntityType::name;
+        $this->options['notnull'] = false;
         return $this;
     }
 
@@ -88,7 +93,13 @@ class Field
      */
     public function getType()
     {
-        return Type::getType($this->typeName);
+        $type = Type::getType($this->typeName);
+
+        if ($type instanceof EntityType) {
+            $type->setEntityClassName($this->hasOne);
+        }
+
+        return $type;
     }
 
     /**

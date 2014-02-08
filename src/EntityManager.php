@@ -13,9 +13,11 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Logging\SQLLogger;
+use Doctrine\DBAL\Types\Type;
 use Granula\EntityManager\EntityManagerEventArgs;
 use Granula\EntityManager\Events;
 use Granula\EntityManager\SQLLoggerClosure;
+use Granula\Type\EntityType;
 
 class EntityManager
 {
@@ -93,6 +95,8 @@ class EntityManager
         $this->classes = $classes;
 
         self::setInstance($this);
+
+        Type::addType(EntityType::name, EntityType::class);
 
         if ($this->dev) {
             $this->getEventManager()->dispatchEvent(Events::preUpdateSchema, new EntityManagerEventArgs($this));
