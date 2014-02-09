@@ -169,6 +169,18 @@ trait ActiveRecord
         return $em->getMetaForClass(get_called_class());
     }
 
+    /**
+     * @param $id
+     * @return Lazy
+     */
+    public static function lazy($id)
+    {
+        return new Lazy(get_called_class(), $id);
+    }
+
+    /**
+     * @param $field
+     */
     public function load($field)
     {
         $lazy = $this->$field;
