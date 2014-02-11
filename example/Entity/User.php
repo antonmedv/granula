@@ -21,6 +21,8 @@ use Granula\Setter;
  * @property \Entity\Profile $profile
  * @property \Entity\User $friend
  * @property \DateTime $date
+ *
+ * @method User find($id) static
  */
 class User
 {

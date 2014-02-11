@@ -46,9 +46,10 @@ $em = new EntityManager($params, [
     Profile::class,
 ]);
 
-/** @var $user User */
-$user = User::find(9);
-print_r($user);
+$user = User::find(1);
+$user->profile->tags = ['one', 'two'];
+$user->profile->save();
+print_r($user->profile);
 
 //$users = User::query('SELECT * FROM users u WHERE u.id > ?', [1], [\PDO::PARAM_INT], function ($result) {
 //    $user = new User();
