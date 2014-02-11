@@ -21,8 +21,8 @@ use Granula\Mapper\ResultMapper;
 $evm = new EventManager();
 $evm->addEventListener(EntityManager\Events::preUpdateSchema, function () {
     if (!empty($sql = EntityManager::getInstance()->getSchemaTool()->getUpdateSchemaSql())) {
-        echo "UPDATE SCHEMA:\n";
-        var_dump($sql);
+        //echo "UPDATE SCHEMA:\n";
+        //var_dump($sql);
     }
 });
 
