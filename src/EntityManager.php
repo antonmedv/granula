@@ -173,8 +173,14 @@ class EntityManager
      */
     public function getMetaForClass($class)
     {
-        $meta = new Meta($class);
-        $class::describe($meta);
+        $cid = "Meta#$class";
+        if ($this->cache->contains($cid)) {
+            $meta = $this->cache->fetch($cid);
+        } else {
+            $meta = new Meta($class);
+            $class::describe($meta);
+            $this->cache->save($cid, $meta);
+        }
 
         return $meta;
     }
