@@ -29,7 +29,12 @@ trait Setter
 
         if ($field && $field->isForeignKey()) {
             $class = $field->getEntityClass();
-            if (!($value instanceof $class)) {
+            $lazy = Lazy::class;
+            if ($value instanceof $class) {
+                // All right
+            } elseif ($value instanceof $lazy) {
+                // All right
+            } else {
                 throw new \InvalidArgumentException("Field '$name' must be '$class'.");
             }
         }

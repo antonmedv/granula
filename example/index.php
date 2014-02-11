@@ -46,10 +46,11 @@ $em = new EntityManager($params, [
     Profile::class,
 ]);
 
-$user = User::find(1);
-$user->profile->tags = ['one', 'two'];
-$user->profile->save();
-print_r($user->profile);
+//$user = User::find(1);
+//$user->profile->tags = ['one', 'two'];
+//$user->profile->save();
+//print_r($user->profile);
+
 
 //$users = User::query('SELECT * FROM users u WHERE u.id > ?', [1], [\PDO::PARAM_INT], function ($result) {
 //    $user = new User();
@@ -63,31 +64,32 @@ print_r($user->profile);
 //    print_r($user);
 //}
 
+
 //$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
 //
 ///** @var $user User */
 //foreach ($result as $user) {
-//    $p = $user->getProfile();
-//    print_r($p);
+//    $p = $user->profile;
 //    if($p instanceof Profile) {
-//        $u = $p->getUser()->getProfile()->getUser()->getProfile()->getUser()->getProfile()->getUser()->getProfile()->getUser();
+//        $u = $p->user->profile->user->profile->user->profile->user;
 //        print_r($u);
 //    }
 //}
 
-//$profile = new Profile();
-//$profile->age = 21;
-//$profile->tags = ['sex', 'girls'];
-//$profile->date = new DateTime();
-//$profile->city = 'NY';
-//$profile->create();
-//
-//$user = new User();
-//$user->setName('Antonio');
-//$user->setEmail('anton@io.com');
-//$user->setPassword('1234');
-//$user->setAvatar('avatar.png');
-//$user->profile = $profile;
-//$user->date = new DateTime('now');
-//$user->create();
-//var_dump($user);
+$profile = new Profile();
+$profile->age = 21;
+$profile->tags = ['one', 'two'];
+$profile->date = new DateTime();
+$profile->city = 'Saint Petersburg';
+$profile->create();
+
+$user = new User();
+$user->name = 'Anton';
+$user->email = uniqid();
+$user->password = '1234';
+$user->avatar = null;
+$user->profile = $profile;
+$user->friend = User::lazy(1);
+$user->date = new DateTime('now');
+$user->create();
+var_dump($user);
