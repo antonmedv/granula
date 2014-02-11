@@ -76,20 +76,20 @@ $em = new EntityManager($params, [
 //    }
 //}
 
-$profile = new Profile();
-$profile->age = 21;
-$profile->tags = ['one', 'two'];
-$profile->date = new DateTime();
-$profile->city = 'Saint Petersburg';
-$profile->create();
-
-$user = new User();
-$user->name = 'Anton';
-$user->email = uniqid();
-$user->password = '1234';
-$user->avatar = null;
-$user->profile = $profile;
-$user->friend = User::lazy(1);
-$user->date = new DateTime('now');
-$user->create();
-var_dump($user);
+//$profile = new Profile();
+//$profile->age = 21;
+//$profile->tags = ['one', 'two'];
+//$profile->date = new DateTime();
+//$profile->city = 'Saint Petersburg';
+//$profile->create();
+//
+//$user = new User();
+//$user->name = 'Anton';
+//$user->email = uniqid();
+//$user->password = '1234';
+//$user->avatar = null;
+//$user->profile = $profile;
+//$user->friend = User::lazy(1);
+//$user->date = new DateTime('now');
+//$user->create();
+//print_r($user);
