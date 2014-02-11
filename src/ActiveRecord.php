@@ -43,9 +43,9 @@ trait ActiveRecord
             };
         }
 
-        $query = $conn->executeQuery($sql, $params, $types);
+        $st = Query::create($sql)->params($params)->types($types)->run($conn);
 
-        while ($result = $query->fetch()) {
+        while ($result = $st->fetch()) {
             yield $map($result);
         }
     }
@@ -115,40 +115,49 @@ trait ActiveRecord
             return null;
         }
 
+        $em = EntityManager::getInstance();
         $meta = self::meta();
-        $mapper = new ResultMapper();
-        $qb = self::createQueryBuilder();
+        $entity = $em->find($meta->getClass(), $id);
 
-        $qb
-            ->select($meta->getSelect())
-            ->from($meta->getTable(), $meta->getAlias())
-            ->where($qb->expr()->eq(
-                $meta->getPrimaryFieldNameWithAlias(),
-                '?'
-            ))
-            ->setMaxResults(1);
+        if (null === $entity) {
 
-        $mapper->setRootEntity($meta);
+            $mapper = new ResultMapper();
+            $qb = self::createQueryBuilder();
 
-        foreach ($meta->getFieldsWhatHasEntities() as $field) {
-            $class = $field->getEntityClass();
-            /** @var $entityMeta Meta */
-            $entityMeta = $class::meta();
-            $alias = $field->getName();
+            $qb
+                ->select($meta->getSelect())
+                ->from($meta->getTable(), $meta->getAlias())
+                ->where($qb->expr()->eq(
+                    $meta->getPrimaryFieldNameWithAlias(),
+                    '?'
+                ))
+                ->setMaxResults(1);
 
-            $qb->addSelect($entityMeta->getSelect($alias));
-            $qb->leftJoin($meta->getAlias(), $entityMeta->getTable(), $alias,
-                $qb->expr()->eq(
-                    $meta->getAlias() . '.' . $field->getName(),
-                    $entityMeta->getPrimaryFieldNameWithAlias($alias)
-                )
-            );
+            $mapper->setRootEntity($meta);
 
-            $mapper->addJoinedEntity($field, $entityMeta, $alias);
+            foreach ($meta->getFieldsWhatHasEntities() as $field) {
+                $class = $field->getEntityClass();
+                /** @var $entityMeta Meta */
+                $entityMeta = $class::meta();
+                $alias = $field->getName();
+
+                $qb->addSelect($entityMeta->getSelect($alias));
+                $qb->leftJoin($meta->getAlias(), $entityMeta->getTable(), $alias,
+                    $qb->expr()->eq(
+                        $meta->getAlias() . '.' . $field->getName(),
+                        $entityMeta->getPrimaryFieldNameWithAlias($alias)
+                    )
+                );
+
+                $mapper->addJoinedEntity($field, $entityMeta, $alias);
+            }
+
+            $result = self::query($qb->getSQL(), [$id], [\PDO::PARAM_INT], $mapper);
+            $entity = $result->valid() ? $result->current() : null;
+            $em->persist($entity);
         }
 
-        $result = self::query($qb->getSQL(), [$id], [\PDO::PARAM_INT], $mapper);
-        return $result->valid() ? $result->current() : null;
+        return $entity;
     }
 
     /**

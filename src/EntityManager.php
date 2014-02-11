@@ -17,6 +17,7 @@ use Doctrine\DBAL\Types\Type;
 use Granula\EntityManager\EntityManagerEventArgs;
 use Granula\EntityManager\Events;
 use Granula\EntityManager\SQLLoggerClosure;
+use Granula\Meta\Accessor;
 use Granula\Type\EntityType;
 
 class EntityManager
@@ -45,6 +46,11 @@ class EntityManager
      * @var bool
      */
     private $dev = false;
+
+    /**
+     * @var array
+     */
+    private $entities = [];
 
     /**
      * @param array $params
@@ -183,4 +189,22 @@ class EntityManager
         }
     }
 
+    public function persist($entity)
+    {
+        $class = get_class($entity);
+        $meta = $this->getMetaForClass($class);
+        $id = Accessor::create($meta)->getPrimary($entity);
+        $this->entities["$class#$id"] = $entity;
+    }
+
+    public function find($class, $id)
+    {
+        $eid = "$class#$id";
+
+        if (isset($this->entities[$eid])) {
+            return $this->entities[$eid];
+        } else {
+            return null;
+        }
+    }
 } 
