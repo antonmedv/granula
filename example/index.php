@@ -5,15 +5,15 @@
  * file that was distributed with this source code.
  */
 /** @var $autoload \Composer\Autoload\ClassLoader */
-$autoload = require_once __DIR__ . '/vendor/autoload.php';
-$autoload->add('Fixture', __DIR__ . '/test/');
+$autoload = require_once __DIR__ . '/../vendor/autoload.php';
+$autoload->add('Entity', __DIR__);
 echo "==============================================================\n\n";
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Fixture\Profile;
-use Fixture\User;
+use Entity\Profile;
+use Entity\User;
 use Granula\EntityManager;
 use Granula\EventManager;
 use Granula\Mapper\ResultMapper;

@@ -5,7 +5,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Fixture;
+namespace Entity;
 
 use Granula\Meta;
 use Granula\ActiveRecord;
@@ -162,8 +162,4 @@ class User
         $this->load('profile');
         return $this->profile;
     }
-
-
-
-
 } 
