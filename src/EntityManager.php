@@ -197,10 +197,12 @@ class EntityManager
 
     public function persist($entity)
     {
-        $class = get_class($entity);
-        $meta = $this->getMetaForClass($class);
-        $id = Accessor::create($meta)->getPrimary($entity);
-        $this->entities["$class#$id"] = $entity;
+        if (null !== $entity) {
+            $class = get_class($entity);
+            $meta = $this->getMetaForClass($class);
+            $id = Accessor::create($meta)->getPrimary($entity);
+            $this->entities["$class#$id"] = $entity;
+        }
     }
 
     public function find($class, $id)
