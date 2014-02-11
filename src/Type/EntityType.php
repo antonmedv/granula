@@ -31,10 +31,14 @@ class EntityType extends Type
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        $entity = new \ReflectionObject($value);
-        $property = $entity->getProperty($this->entityPrimaryFieldName);
-        $property->setAccessible(true);
-        return $property->getValue($value);
+        if (null === $value) {
+            return null;
+        } else {
+            $entity = new \ReflectionObject($value);
+            $property = $entity->getProperty($this->entityPrimaryFieldName);
+            $property->setAccessible(true);
+            return $property->getValue($value);
+        }
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform)
@@ -48,8 +52,6 @@ class EntityType extends Type
     public function setEntityClassName($entityClassName)
     {
         $this->entityClassName = $entityClassName;
-        /** @var $meta \Granula\Meta */
-        $meta = $entityClassName::meta();
-        $this->entityPrimaryFieldName = $meta->getPrimaryField()->getName();
+        $this->entityPrimaryFieldName = $entityClassName::meta()->getPrimaryField()->getName();
     }
 }
