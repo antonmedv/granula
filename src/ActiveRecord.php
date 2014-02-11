@@ -8,8 +8,8 @@
 namespace Granula;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Granula\Mapper\Mapper;
 use Granula\Mapper\ResultMapper;
+use Granula\Meta\Accessor;
 use Granula\Meta\SqlGenerator;
 use Granula\Type\EntityType;
 
@@ -88,6 +88,19 @@ trait ActiveRecord
         } else {
             $conn->update($meta->getTable(), $data, [$primary => $this->$primary]);
         }
+    }
+
+    /**
+     * Delete current entity.
+     */
+    public function delete()
+    {
+        $meta = self::meta();
+        $em = EntityManager::getInstance();
+        $em->getConnection()->delete(
+            $meta->getTable(),
+            [$meta->getPrimaryField()->getName() => Accessor::create($meta)->getPrimary($this)]
+        );
     }
 
 
