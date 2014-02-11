@@ -48,7 +48,7 @@ $em = new EntityManager($params, [
 
 /** @var $user User */
 $user = User::find(9);
-
+print_r($user);
 
 //$users = User::query('SELECT * FROM users u WHERE u.id > ?', [1], [\PDO::PARAM_INT], function ($result) {
 //    $user = new User();

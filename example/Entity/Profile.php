@@ -10,18 +10,31 @@ namespace Entity;
 use Doctrine\DBAL\Types\Type;
 use Granula\ActiveRecord;
 use Granula\Meta;
+use Granula\Setter;
 use Granula\Type\EntityType;
 
+/**
+ * Class Profile
+ * @property int $id
+ * @property string $city
+ * @property \DateTime $date
+ * @property int $age
+ * @property array $tags
+ * @property User $user
+ *
+ * @method User find($id) static
+ */
 class Profile
 {
     use ActiveRecord;
+    use Setter;
 
-    public $id;
-    public $city;
-    public $date;
-    public $age;
-    public $tags;
-    public $user;
+    private $id;
+    private $city;
+    private $date;
+    private $age;
+    private $tags;
+    private $user;
 
     public static function describe(Meta $meta)
     {
@@ -32,14 +45,5 @@ class Profile
         $meta->field('age', Type::INTEGER);
         $meta->field('tags', Type::SIMPLE_ARRAY);
         $meta->field('user', EntityType::name)->entity(User::class);
-    }
-
-    /**
-     * @return User
-     */
-    public function getUser()
-    {
-        $this->load('user');
-        return $this->user;
     }
 } 
