@@ -33,6 +33,8 @@ class EntityType extends Type
     {
         if (null === $value) {
             return null;
+        } elseif ($value instanceof Lazy) {
+            return $value->getId();
         } else {
             $entity = new \ReflectionObject($value);
             $property = $entity->getProperty($this->entityPrimaryFieldName);

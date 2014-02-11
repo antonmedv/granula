@@ -7,9 +7,10 @@
 
 namespace Granula;
 
-class Lazy 
+class Lazy
 {
     private $class;
+
     private $id;
 
     public function __construct($class, $id)
@@ -23,4 +24,14 @@ class Lazy
         $class = $this->class;
         return $class::find($this->id);
     }
-} 
+
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+}
