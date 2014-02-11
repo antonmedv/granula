@@ -10,6 +10,7 @@ namespace Granula;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Granula\Mapper\Mapper;
 use Granula\Mapper\ResultMapper;
+use Granula\Meta\SqlGenerator;
 use Granula\Type\EntityType;
 
 trait ActiveRecord
@@ -121,14 +122,15 @@ trait ActiveRecord
 
         if (null === $entity) {
 
+            $sqlGenerator = new SqlGenerator($meta);
             $mapper = new ResultMapper();
             $qb = self::createQueryBuilder();
 
             $qb
-                ->select($meta->getSelect())
+                ->select($sqlGenerator->getSelect())
                 ->from($meta->getTable(), $meta->getAlias())
                 ->where($qb->expr()->eq(
-                    $meta->getPrimaryFieldNameWithAlias(),
+                    $sqlGenerator->getPrimaryFieldNameWithAlias(),
                     '?'
                 ))
                 ->setMaxResults(1);
@@ -139,13 +141,14 @@ trait ActiveRecord
                 $class = $field->getEntityClass();
                 /** @var $entityMeta Meta */
                 $entityMeta = $class::meta();
+                $entitySqlGenerator = new SqlGenerator($entityMeta);
                 $alias = $field->getName();
 
-                $qb->addSelect($entityMeta->getSelect($alias));
+                $qb->addSelect($entitySqlGenerator->getSelect($alias));
                 $qb->leftJoin($meta->getAlias(), $entityMeta->getTable(), $alias,
                     $qb->expr()->eq(
                         $meta->getAlias() . '.' . $field->getName(),
-                        $entityMeta->getPrimaryFieldNameWithAlias($alias)
+                        $entitySqlGenerator->getPrimaryFieldNameWithAlias($alias)
                     )
                 );
 

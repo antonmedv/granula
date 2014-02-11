@@ -133,35 +133,4 @@ class Meta
     {
         return $this->fields[$fieldName];
     }
-
-    /**
-     * @return string
-     */
-    public function getPrimaryFieldNameWithAlias($alias = null)
-    {
-        return
-            ($alias === null ? $this->getAlias() : $alias)
-            . '.'
-            . $this->getPrimaryField()->getName();
-    }
-
-    public function getSelect($alias = null)
-    {
-        $select = [];
-
-        foreach ($this->fields as $field) {
-            $select[] =
-                ($alias === null ? $this->getAlias() : $alias)
-                . '.'
-                . $field->getName()
-                . ' AS '
-                . ($alias === null ? $this->getAlias() : $alias)
-                . '_'
-                . $field->getName();
-        }
-
-        return $select;
-    }
-
-
 }
