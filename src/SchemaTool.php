@@ -10,6 +10,7 @@ namespace Granula;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\Visitor\DropSchemaSqlCollector;
 
 class SchemaTool
@@ -41,14 +42,14 @@ class SchemaTool
      */
     public function createSchema()
     {
-        foreach($this->getCreateSchemaSql() as $sql) {
+        foreach ($this->getCreateSchemaSql() as $sql) {
             $this->connection->executeQuery($sql);
         }
     }
 
     public function updateSchema($saveMode = false)
     {
-        foreach($this->getUpdateSchemaSql($saveMode) as $sql) {
+        foreach ($this->getUpdateSchemaSql($saveMode) as $sql) {
             $this->connection->executeQuery($sql);
         }
     }
@@ -97,12 +98,14 @@ class SchemaTool
     {
         $schema = new Schema();
 
+        /** @var $tables Table[] */
         $tables = [];
+        $foreignKeys = [];
 
         // Create all tables and save them to $tables.
-        foreach ($this->em->getMetaForAllClasses() as $class => $meta) {
+        foreach ($this->em->getMetaForAllClasses() as $fromClass => $meta) {
 
-            $tables[$class] = $table = $schema->createTable($meta->getTable());
+            $tables[$fromClass] = $table = $schema->createTable($meta->getTable());
             $primaryKeys = [];
             $uniqueKeys = [];
 
@@ -115,6 +118,10 @@ class SchemaTool
 
                 if ($field->isUnique()) {
                     $uniqueKeys[] = $field->getName();
+                }
+
+                if ($field->isForeignKey()) {
+                    $foreignKeys[] = [$fromClass, $field->getName(), $field->getEntityClass()];
                 }
             }
 
@@ -129,6 +136,18 @@ class SchemaTool
             foreach ($meta->getIndexes() as $index) {
                 $table->addIndex($index->getColumns(), $index->getName(), $index->getFlags());
             }
+        }
+
+        // Add foreign key constraint after creating all tables.
+        foreach ($foreignKeys as $list) {
+            list($fromClass, $field, $toClass) = $list;
+
+            $tables[$fromClass]->addForeignKeyConstraint(
+                $tables[$toClass],
+                [$field],
+                [$this->em->getMetaForClass($toClass)->getPrimaryField()->getName()],
+                ["onUpdate" => "CASCADE"]
+            );
         }
 
         return $schema;
@@ -201,7 +220,7 @@ class SchemaTool
         $fullSchema = $sm->createSchema();
 
         foreach ($fullSchema->getTables() as $table) {
-            if ( ! $schema->hasTable($table->getName())) {
+            if (!$schema->hasTable($table->getName())) {
                 foreach ($table->getForeignKeys() as $foreignKey) {
                     /* @var $foreignKey \Doctrine\DBAL\Schema\ForeignKeyConstraint */
                     if ($schema->hasTable($foreignKey->getForeignTableName())) {

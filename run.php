@@ -46,42 +46,45 @@ $em = new EntityManager($params, [
     Profile::class,
 ]);
 
-//$user = User::find(1);
-//print_r($user);
+$user = User::find(1);
+print_r($user);
 
 //$users = User::query('SELECT * FROM users u WHERE u.id > ?', [1], [\PDO::PARAM_INT], function ($result) {
 //    $user = new User();
 //    $user->id = $result['id'];
 //    $user->name = $result['name'];
 //    $user->email = $result['email'];
-//    $user->profile = Profile::find($result['profile']);
+//    $user->profile = Profile::lazy($result['profile']);
 //    return $user;
 //});
 //foreach($users as $user) {
 //    print_r($user);
 //}
 
-$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
-
-/** @var $user User */
-foreach ($result as $user) {
-    $p = $user->getProfile();
-    print_r($p);
-    if($p instanceof Profile) {
-        $u = $p->getUser()->getProfile()->getUser()->getProfile()->getUser()->getProfile()->getUser()->getProfile()->getUser();
-        print_r($u);
-    }
-}
+//$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
+//
+///** @var $user User */
+//foreach ($result as $user) {
+//    $p = $user->getProfile();
+//    print_r($p);
+//    if($p instanceof Profile) {
+//        $u = $p->getUser()->getProfile()->getUser()->getProfile()->getUser()->getProfile()->getUser()->getProfile()->getUser();
+//        print_r($u);
+//    }
+//}
 
 //$profile = new Profile();
-//$profile->user_id = 12344;
+//$profile->age = 21;
+//$profile->tags = ['sex', 'girls'];
+//$profile->date = new DateTime();
+//$profile->city = 'NY';
 //$profile->create();
 //
 //$user = new User();
-//$user->setName('Elfet');
-//$user->setEmail('elfet@medvedev.be');
+//$user->setName('Antonio');
+//$user->setEmail('anton@io.com');
 //$user->setPassword('1234');
-//$user->setAvatar(null);
+//$user->setAvatar('avatar.png');
 //$user->profile = $profile;
 //$user->date = new DateTime('now');
 //$user->create();

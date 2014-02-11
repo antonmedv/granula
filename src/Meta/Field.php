@@ -118,4 +118,9 @@ class Field
     {
         return $this->entityClass;
     }
+
+    public function isForeignKey()
+    {
+        return $this->typeName === EntityType::name;
+    }
 }
