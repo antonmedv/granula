@@ -5,6 +5,7 @@ use Granula\ActiveRecord;
 use Granula\Setter;
 
 // Описываем класс с приватными полями и включаем трейт Setter.
+// Переопределяем сеттер для поля name.
 class User
 {
     use ActiveRecord;
