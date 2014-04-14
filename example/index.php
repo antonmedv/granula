@@ -46,50 +46,53 @@ $em = new EntityManager($params, [
     Profile::class,
 ]);
 
-//$user = User::find(1);
-//$user->profile->tags = ['one', 'two'];
-//$user->profile->save();
-//print_r($user->profile);
+$user = User::find(1);
+$user->profile->tags = ['one', 'two'];
+$user->profile->save();
+print_r($user->profile);
 
 
-//$users = User::query('SELECT * FROM users u WHERE u.id > ?', [1], [\PDO::PARAM_INT], function ($result) {
-//    $user = new User();
-//    $user->id = $result['id'];
-//    $user->name = $result['name'];
-//    $user->email = $result['email'];
-//    $user->profile = Profile::lazy($result['profile']);
-//    return $user;
-//});
-//foreach($users as $user) {
-//    print_r($user);
-//}
+$users = User::query('SELECT * FROM users u WHERE u.id > ?', [1], [\PDO::PARAM_INT], function ($result) {
+    $user = new User();
+    $user->id = $result['id'];
+    $user->name = $result['name'];
+    $user->email = $result['email'];
+    $user->profile = Profile::lazy($result['profile']);
+    return $user;
+});
+foreach($users as $user) {
+    print_r($user);
+}
 
 
-//$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
-//
-///** @var $user User */
-//foreach ($result as $user) {
-//    $p = $user->profile;
-//    if($p instanceof Profile) {
-//        $u = $p->user->profile->user->profile->user->profile->user;
-//        print_r($u);
-//    }
-//}
+$result = User::query('SELECT * FROM users u WHERE u.id IN (?)', [[1, 2]], [Connection::PARAM_INT_ARRAY]);
 
-//$profile = new Profile();
-//$profile->age = 21;
-//$profile->tags = ['one', 'two'];
-//$profile->date = new DateTime();
-//$profile->city = 'Saint Petersburg';
-//$profile->create();
-//
-//$user = new User();
-//$user->name = 'Anton';
-//$user->email = uniqid();
-//$user->password = '1234';
-//$user->avatar = null;
-//$user->profile = $profile;
-//$user->friend = User::lazy(1);
-//$user->date = new DateTime('now');
-//$user->create();
-//print_r($user);
+/** @var $user User */
+foreach ($result as $user) {
+    $p = $user->profile;
+    if($p instanceof Profile) {
+        $u = $p->user->profile->user->profile->user->profile->user;
+        print_r($u);
+    }
+}
+
+//$result = User::createQuery('SELECT {u}, {p} FROM users u LEFT JOIN profile p ON p.id = u.profile WHERE u.id IN (?)')
+//    ->addJoin(Profile::class, 'p')->params([[1, 2, 3]])->types([Connection::PARAM_INT_ARRAY])->exequte();
+
+$profile = new Profile();
+$profile->age = 21;
+$profile->tags = ['one', 'two'];
+$profile->date = new DateTime();
+$profile->city = 'Saint Petersburg';
+$profile->create();
+
+$user = new User();
+$user->name = 'Anton';
+$user->email = uniqid();
+$user->password = '1234';
+$user->avatar = null;
+$user->profile = $profile;
+$user->friend = User::lazy(1);
+$user->date = new DateTime('now');
+$user->create();
+print_r($user);
