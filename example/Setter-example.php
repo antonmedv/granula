@@ -13,6 +13,11 @@ class User
     private $id;
     private $name;
     private $email;
+    
+    public function setName($value) 
+    {
+        $this->name = strtoupper($value);
+    }
 } 
 
 // Создаём экземпляр класса.
