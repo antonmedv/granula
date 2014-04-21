@@ -34,12 +34,13 @@ $params = [
             //echo "• $sql · " . json_encode($params) . "\n";
         },
 
-    'driver' => 'pdo_mysql',
-    'host' => 'localhost',
+    'driver' => 'pdo_sqlite',
+   // 'host' => 'localhost',
     'user' => 'root',
     'password' => '',
     'dbname' => 'granula',
-    'charset' => 'utf8'
+    'path' => __DIR__ . '/sqlite.db',
+   // 'charset' => 'utf8'
 ];
 
 $em = new EntityManager($params, [
@@ -55,4 +56,4 @@ $c = '';
 foreach ($sql as $i) {
     $c .= "$i\n";
 }
-file_put_contents('schema.sql', $c);
+file_put_contents('schema-sqlite.sql', $c);
