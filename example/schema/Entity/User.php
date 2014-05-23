@@ -20,6 +20,7 @@ use Granula\Setter;
  * @property string $avatar
  * @property \Entity\Profile $profile
  * @property \Entity\User $friend
+ * @property \Entity\Address $address
  * @property \DateTime $birthDate
  *
  * @method User find($id) static
@@ -36,6 +37,7 @@ class User
     private $avatar;
     private $profile;
     private $friend;
+    private $address;
     private $birthDate;
 
     public static function describe(Meta $meta)
@@ -48,6 +50,7 @@ class User
         $meta->field('avatar', 'string')->options(['notnull' => false, 'default' => '']);
         $meta->field('profile', 'entity')->entity(Profile::class);
         $meta->field('friend', 'entity')->entity(User::class);
+        $meta->field('address', 'entity')->entity(Address::class);
         $meta->field('birthDate', 'datetime');
         $meta->index(['name', 'email'], 'name_email_index');
     }

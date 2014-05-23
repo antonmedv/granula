@@ -13,6 +13,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Entity\Address;
+use Entity\City;
 use Entity\Profile;
 use Entity\User;
 use Granula\EntityManager;
@@ -31,22 +32,23 @@ $params = [
     'dev' => true,
     'event_manager' => $evm,
     'sql_logger' => function ($sql, $params = []) {
-            //echo "• $sql · " . json_encode($params) . "\n";
+            echo "• $sql · " . json_encode($params) . "\n";
         },
 
-    'driver' => 'pdo_sqlite',
-   // 'host' => 'localhost',
+    'driver' => 'pdo_mysql',
+    'host' => 'localhost',
     'user' => 'root',
     'password' => '',
     'dbname' => 'granula',
-    'path' => __DIR__ . '/sqlite.db',
-   // 'charset' => 'utf8'
+    //'path' => __DIR__ . '/sqlite.db',
+    'charset' => 'utf8'
 ];
 
 $em = new EntityManager($params, [
     User::class,
     Profile::class,
     Address::class,
+    City::class,
 ]);
 
 
@@ -57,3 +59,8 @@ foreach ($sql as $i) {
     $c .= "$i\n";
 }
 file_put_contents('schema-sqlite.sql', $c);
+
+
+$user = User::find(2);
+$cityName = $user->friend->address->city->name;
+echo $cityName;

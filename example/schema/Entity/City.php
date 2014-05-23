@@ -15,20 +15,20 @@ use Granula\Type\EntityType;
 
 /**
  * @property int $id
- * @property City $city
+ * @property string $name
  */
-class Address
+class City
 {
     use ActiveRecord;
     use Setter;
 
     private $id;
-    private $city;
+    private $name;
 
     public static function describe(Meta $meta)
     {
-        $meta->table('address');
+        $meta->table('city');
         $meta->field('id', Type::INTEGER)->primary();
-        $meta->field('city', 'entity')->entity(City::class);
+        $meta->field('name', 'string');
     }
 } 
